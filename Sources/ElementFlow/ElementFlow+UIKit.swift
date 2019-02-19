@@ -28,7 +28,7 @@ func add(elements: [ElementType], to view: UIView) {
       if subView.view.superview != view {
         view.addSubview(subView.view)
       }
-    case let subFlow as Flow:
+    case let subFlow as SubFlow:
       add(elements: subFlow.elements, to: view)
     default:
       break;
@@ -45,46 +45,46 @@ public class View: Element {
     }
   }
   public var flex: Double?
-  public var margin: Margin
+  public var inset: Inset
+  public var shift: Shift
   public var align: Alignment?
   
   public init(
     _ view: UIView,
-    size: (Double, Double)? = nil,
+    width: Double? = nil,
+    height: Double? = nil,
     flex: Double? = nil,
-    margin: Double? = nil,
-    marginLeft: Double? = nil,
-    marginTop: Double? = nil,
-    marginRight: Double? = nil,
-    marginBottom: Double? = nil,
-    marginHorizontal: Double? = nil,
-    marginVertical: Double? = nil,
-    align: Alignment? = nil
+    shiftLeft: Double = 0,
+    shiftUp: Double = 0,
+    shiftRight: Double = 0,
+    shiftDown: Double = 0,
+    align: Alignment? = nil,
+    inset: InsetValue = 0
   ) {
     self.view = view
-    if let (width, height) = size {
-      self.frame = Rect(
-        x: Double(view.frame.origin.x),
-        y: Double(view.frame.origin.y),
-        width: Double(width),
-        height: Double(height)
-      )
-      view.frame = self.frame.cgRect
-    } else {
-      self.frame = Rect(
-        x: Double(view.frame.origin.x),
-        y: Double(view.frame.origin.y),
-        width: Double(view.frame.size.width),
-        height: Double(view.frame.size.height)
-      )
-    }
+    self.frame = Rect(
+      x: Double(view.frame.origin.x),
+      y: Double(view.frame.origin.y),
+      width: width ?? Double(view.frame.size.width),
+      height: height ?? Double(view.frame.size.height)
+    )
     
     self.flex = flex
-    self.margin = Margin(
-      left: marginHorizontal ?? marginLeft ?? margin ?? 0,
-      top: marginVertical ?? marginTop ?? margin ?? 0,
-      right: marginHorizontal ?? marginRight ?? margin ?? 0,
-      bottom: marginVertical ?? marginBottom ?? margin ?? 0
+
+    switch inset {
+    case let inset as Double:
+      self.inset = Inset(inset)
+    case let inset as Inset:
+      self.inset = inset
+    default:
+      self.inset = Inset(0)
+    }
+    
+    self.shift = Shift(
+      left: shiftLeft,
+      up: shiftUp,
+      right: shiftRight,
+      down: shiftDown
     )
     self.align = align
   }
